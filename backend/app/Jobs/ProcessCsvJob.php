@@ -4,18 +4,19 @@ namespace App\Jobs;
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
-use App\Events\CsvProcessingProgress;
 use App\Models\Task;
 use App\Models\CsvError;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Bus\Queueable;
 use App\Mail\CsvProcessingComplete;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Events\CsvProcessingProgress;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class ProcessCsvJob implements ShouldQueue
 {
@@ -41,8 +42,11 @@ class ProcessCsvJob implements ShouldQueue
         $errors = [];
 
         foreach ($rows as $row) {
-            if (count($row) < 3) { // Assuming minimum 3 columns
-                $errors[] = ['row' => $row, 'error' => 'Invalid data format'];
+            // Trim values and check for missing data
+            $row = array_map('trim', $row);
+
+            if (count($row) < 3 || empty($row[0]) || empty($row[1]) || empty($row[2])) {
+                $errors[] = ['row' => $row, 'error' => 'Invalid data format (Missing values)'];
                 continue;
             }
 
@@ -50,7 +54,9 @@ class ProcessCsvJob implements ShouldQueue
                 Task::create([
                     'title' => $row[0],
                     'description' => $row[1],
-                    'created_by' => $this->userId,
+                    'status' => $row[2],
+                    'assigned_to' => $this->userId,
+                    'project_id' => 1,
                 ]);
             } catch (\Exception $e) {
                 $errors[] = ['row' => $row, 'error' => $e->getMessage()];
@@ -61,6 +67,10 @@ class ProcessCsvJob implements ShouldQueue
             // Send real-time progress update via Pusher
             broadcast(new CsvProcessingProgress($this->userId, $processed, $totalRows));
         }
+
+        // if (!empty($errors)) {
+        //     Log::error('CSV Processing Errors', $errors);
+        // }
 
         // Save errors
         if (!empty($errors)) {
