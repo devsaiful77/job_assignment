@@ -9,7 +9,7 @@ const routes = [
         name: "admin_login",
         meta: {
             title: "Admin Login",
-            // isGuest: true,
+            isGuest: true,
         },
     },
 
@@ -19,7 +19,7 @@ const routes = [
         redirect: "/dashboard",
         component: () => import("../layouts/Master.vue"),
         meta: {
-            // requiresAuth: true,
+            requiresAuth: true,
         },
         children: [
             /* ====================== Start Admin Dashboard Routing ====================== */
@@ -51,27 +51,15 @@ const router = createRouter({
     },
 });
 
-/* ================= Admin Middleware router =================== */
-// router.beforeEach((to, from, next) => {
-//   document.title = to.meta.title || "Admin Panel";
-//   if (
-//     to.matched.some((record) => record.meta.requiresAuth) &&
-//     !store.state.user.token
-//   ) {
-//     next({
-//       name: "backend_login",
-//     });
-//   } else if (
-//     to.matched.some((record) => record.meta.isGuest) &&
-//     store.state.user.token
-//   ) {
-//     next({
-//       name: "backend_dashboard",
-//     });
-//   } else {
-//     next(); // make sure to always call next()!
-//   }
-// });
-/* ================= Protected router =================== */
+
+router.beforeEach((to, from, next) => {
+    if (to.meta.requiresAuth && !store.state.user.token) {
+        next({ name: "admin_login" });
+    } else if (store.state.user.token && to.meta.isGuest) {
+        next({ name: "admin_dashboard" });
+    } else {
+        next();
+    }
+});
 
 export default router;

@@ -1,31 +1,51 @@
 import { createStore } from "vuex";
+import axiosClient from "../axiosClient";
 
-/* ========================== State ========================== */
-const state = {
-    user: {
-        data: {},
-        token: localStorage.getItem("ADMIN_TOKEN"),
-    },
-
-    /* ========================== ========================== */
-    image_base_link: "/../storage/",
-};
-
-/* ========================== Getters ========================== */
-const getters = {};
-
-/* ========================== Actions ========================== */
-const actions = {};
-
-/* ========================== Mutations ========================== */
-const mutations = {};
-
-/* ========================== Store ========================== */
 const store = createStore({
-    state: state,
-    mutations: mutations,
-    getters: getters,
-    actions: actions,
+    state: {
+        user: {
+            data: {},
+            token: sessionStorage.getItem("TOKEN"),
+        },
+    },
+    getters: {},
+    actions: {
+        login({ commit }, user) {
+            return axiosClient.post("/login", user).then(({ data }) => {
+                commit("setUser", data.user);
+                commit("setToken", data.token);
+                return data;
+            });
+        },
+        logout({ commit }) {
+            return axiosClient.post("/logout").then((response) => {
+                commit("logout");
+                return response;
+            });
+        },
+        getUser({ commit }) {
+            return axiosClient.get("/user").then((res) => {
+                console.log(res);
+                commit("setUser", res.data);
+            });
+        },
+    },
+    mutations: {
+        logout: (state) => {
+            state.user.token = null;
+            state.user.data = {};
+            sessionStorage.removeItem("TOKEN");
+        },
+
+        setUser: (state, user) => {
+            state.user.data = user;
+        },
+        setToken: (state, token) => {
+            state.user.token = token;
+            sessionStorage.setItem("TOKEN", token);
+        },
+    },
+    modules: {},
 });
 
 export default store;
