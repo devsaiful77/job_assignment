@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/store', [UserController::class, 'store']);
     Route::get('/user/edit/{id}', [UserController::class, 'edit']);
     Route::post('/user/update/{id}', [UserController::class, 'update']);
+    Route::get('/user/active-inactive/{id}', [UserController::class, 'activeInactive']);
 
     // project
     Route::get('/projects', [ProjectController::class, 'index']);
