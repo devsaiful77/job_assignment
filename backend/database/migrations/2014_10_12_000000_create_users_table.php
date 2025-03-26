@@ -21,16 +21,6 @@ return new class extends Migration
             $table->integer('status')->default(1);
             $table->rememberToken();
             $table->timestamps();
-
-            // landingpage_with_inventory
-
-                        
-
-
-
-
-
-
         });
     }
 

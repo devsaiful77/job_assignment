@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Task extends Model
 {
     use HasFactory;
+    protected $table = 'tasks';
+    protected $fillable = ['title', 'description', 'status', 'project_id', 'assigned_to'];
+
+    public function project(){
+        return $this->belongsTo(Project::class);
+    }
+
+    public function assignedUser(){
+        return $this->belongsTo(User::class, 'assigned_to', 'id');
+    }
+    
 }
