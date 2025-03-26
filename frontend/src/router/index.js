@@ -80,6 +80,55 @@ const routes = [
         },
       },
 
+
+      // Tasks
+
+      {
+        path: "/tasks",
+        component: () => import("../views/task/Index.vue"),
+        name: "tasks",
+        meta: {
+          title: "Task list",
+        },
+      },
+
+      {
+        path: "/task/create",
+        component: () => import("../views/task/Create.vue"),
+        name: "task_create",
+        meta: {
+          title: "Task Create",
+        },
+      },
+
+      {
+        path: "/task/edit/:id",
+        name: "task_edit",
+        component: () => import("../views/task/Edit.vue"),
+        meta: {
+          title: "Task Edit",
+        },
+      },
+
+      {
+        path: "/task-user/edit/:id",
+        name: "task_user",
+        component: () => import("../views/task/TaskUpdate.vue"),
+        meta: {
+          title: "User Task",
+        },
+      },
+
+
+      {
+        path: "/task-import",
+        name: "task_import",
+        component: () => import("../views/task/TaskImport.vue"),
+        meta: {
+          title: "User Task",
+        },
+      },
+
       
 
 

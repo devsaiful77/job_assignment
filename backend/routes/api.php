@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
 
@@ -36,6 +37,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/project/store', [ProjectController::class, 'store']);
     Route::get('/project/edit/{id}', [ProjectController::class, 'edit']);
     Route::post('/project/update/{id}', [ProjectController::class, 'update']);
+
+
+    // Task
+    Route::get('/tasks', [TaskController::class, 'index']);
+    Route::post('/task/store', [TaskController::class, 'store']);
+    Route::get('/task/edit/{id}', [TaskController::class, 'edit']);
+    Route::post('/task/update/{id}', [TaskController::class, 'update']);
+    Route::post('/task/user/update/{id}', [TaskController::class, 'taskUpdate']);
+    Route::get('/task/user-project', [TaskController::class, 'getProjectAndUser']);
+
+    Route::post('/upload-tasks', [TaskController::class, 'uploadTasks']);
 
 
 });

@@ -23,6 +23,9 @@
               <router-link class="nav-link" :to="{ name: 'projects' }">Project</router-link>
             </li>
             <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'tasks' }">Tasks</router-link>
+            </li>
+            <li class="nav-item">
               <button
                 style="margin-top: 5px"
                 type="button"

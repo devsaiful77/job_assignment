@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('csv_errors', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable();
-            $table->text('description')->nullable();
-            $table->integer('project_id');
-            $table->integer('assigned_to');
-            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
+            $table->integer('user_id')->nullable();
+            $table->text('errors')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('csv_errors');
     }
 };
