@@ -12,6 +12,7 @@ class UserController extends Controller
 
     public function index()
     {
+        $this->authorize('manageUsers', User::class);
         try {
             $users = User::with('role:id,name')->where('id', '!=', Auth::user()->id)->orderBy('id', 'DESC')->get();
             return response()->json([
@@ -28,6 +29,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('manageUsers', User::class);
         $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -68,15 +70,19 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        try {
-            $validatedData = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
-                'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-                'role_id' => ['required'],
-            ]);
+        $user = User::findOrFail($id);
+        $this->authorize('update', $user);
 
-            User::findOrFail($id)->update($validatedData);
+        $validatedData = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'role_id' => ['required'],
+        ]);
+
+        try {
+            
+            $user->update($validatedData);
             return response()->json([
                 'status' => true,
                 'message' => 'User updated successfully',

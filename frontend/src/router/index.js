@@ -50,6 +50,36 @@ const routes = [
         },
       },
 
+
+      // project
+
+      {
+        path: "/projects",
+        component: () => import("../views/project/Index.vue"),
+        name: "projects",
+        meta: {
+          title: "Project list",
+        },
+      },
+
+      {
+        path: "/project/create",
+        component: () => import("../views/project/Create.vue"),
+        name: "project_create",
+        meta: {
+          title: "Project Create",
+        },
+      },
+
+      {
+        path: "/project/edit/:id",
+        name: "project_edit",
+        component: () => import("../views/project/Edit.vue"),
+        meta: {
+          title: "Project Edit",
+        },
+      },
+
       
 
 

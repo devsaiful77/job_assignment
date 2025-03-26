@@ -14,4 +14,9 @@ class Project extends Model
         'description',
         'created_by'
     ];
+
+    public function createBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
 }

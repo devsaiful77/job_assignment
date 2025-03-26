@@ -20,6 +20,9 @@
               <router-link class="nav-link" aria-current="page" :to="{ name: 'users' }">Users</router-link>
             </li>
             <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'projects' }">Project</router-link>
+            </li>
+            <li class="nav-item">
               <button
                 style="margin-top: 5px"
                 type="button"

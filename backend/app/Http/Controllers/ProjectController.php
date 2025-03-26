@@ -10,11 +10,13 @@ class ProjectController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Project::class);
+
         try {
-            $project = Project::orderBy('id', 'desc')->get();
+            $projects = Project::with('createBy:id,name')->orderBy('id', 'desc')->get();
             return response()->json([
                 'status' => true,
-                'project' => $project
+                'projects' => $projects
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -26,11 +28,13 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Project::class);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:projects'],
+            'description' => ['required', 'string', 'max:600'],
+        ]);
+
         try {
-            $data = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'description' => ['required', 'string', 'max:600'],
-            ]);
 
             $data['created_by'] = Auth::user()->id;
 
@@ -47,18 +51,39 @@ class ProjectController extends Controller
         }
     }
 
+    public function edit($id)
+    {
+        $project = Project::findOrFail($id);
+        $this->authorize('update', $project);
+        try {
+            return response()->json([
+                'status' => true,
+                'project' => $project,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
 
     public function update(Request $request, $id)
     {
+        $project = Project::findOrFail($id);
+        $this->authorize('update', $project);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:projects,name,' . $id],
+            'description' => ['required', 'string', 'max:600'],
+        ]);
+
         try {
-            $data = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'description' => ['required', 'string', 'max:600'],
-            ]);
 
             $data['created_by'] = Auth::user()->id;
 
-            Project::find($id)->update($data);
+            $project->update($data);
             return response()->json([
                 'status' => true,
                 'message' => 'Project updated successfully',
