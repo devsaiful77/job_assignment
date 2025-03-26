@@ -6,30 +6,10 @@
         "build": "vite build"
     },
     "devDependencies": {
-        "@popperjs/core": "^2.11.6",
         "@vitejs/plugin-vue": "^4.5.0",
         "axios": "^1.6.5",
         "laravel-vite-plugin": "^1.0.0",
-        "vite": "^5.0.0",
-        "vite-plugin-vuetify": "^2.0.1",
-        "vue": "^3.2.41",
-        "vuetify": "^3.4.8"
-    },
-    "dependencies": {
-        "@aacassandra/vue3-progressbar": "^1.0.3",
-        "@ckeditor/ckeditor5-build-classic": "^41.0.0",
-        "@ckeditor/ckeditor5-vue": "^5.1.0",
-        "@mdi/font": "^7.3.67",
-        "laravel-vue-pagination": "^4.1.3",
-        "sweetalert2": "^11.0.19",
-        "vform": "^2.1.2",
-        "vue-loading-overlay": "6.0",
-        "vue-multiselect": "^3.1.0",
-        "vue-progressbar": "^0.7.5",
-        "vue-router": "^4.2.5",
-        "vue-sweetalert2": "^5.0.5",
-        "vue-toasted": "^1.1.28",
-        "vue3-toastify": "^0.2.1",
-        "vuex": "^4.0.2"
+        "vite": "^5.0.0"
     }
+    
 }

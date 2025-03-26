@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,4 @@ Route::get('/', function () {
 
 
 // laravel and vue mix routing
-Route::get('/admin/{any}', function () {
-    return view('app');
-})->where('any', '^(?!api\/)[\/\w\.\,-]*');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
