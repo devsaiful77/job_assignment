@@ -14,46 +14,34 @@ class AuthController extends Controller
             'password' => [
                 'required',
             ],
+            'remember' => 'boolean'
         ]);
+        $remember = $credentials['remember'] ?? false;
+        unset($credentials['remember']);
 
-        try {
-            if (!Auth::attempt($credentials)) {
-                return response([
-                    'error' => 'The Provided credentials are not correct'
-                ], 422);
-            }
-            $user = Auth::user();
-            $token = $user->createToken('main')->plainTextToken;
-
-            return response()->json([
-                'status' => true,
-                'user' => $user,
-                'token' => $token
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
+        if (!Auth::attempt($credentials, $remember)) {
+            return response([
+                'error' => 'The Provided credentials are not correct'
+            ], 422);
         }
+        $user = Auth::user();
+        $token = $user->createToken('main')->plainTextToken;
+
+        return response([
+            'user' => $user,
+            'token' => $token
+        ]);
     }
 
     public function logout()
     {
-        try {
-            /** @var User $user */
-            $user = Auth::user();
-            $user->currentAccessToken()->delete();
+        /** @var User $user */
+        $user = Auth::user();
+        // Revoke the token that was used to authenticate the current request...
+        $user->currentAccessToken()->delete();
 
-            return response()->json([
-                'status' => true,
-                'message' => 'User logged out successfully'
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
-        }
+        return response([
+            'success' => true
+        ]);
     }
 }

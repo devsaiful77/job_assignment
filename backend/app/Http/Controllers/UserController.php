@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
-{
+{   
+
+
     public function index()
     {
         try {
@@ -47,6 +49,22 @@ class UserController extends Controller
         }
     }
 
+    public function edit($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            return response()->json([
+                'status' => true,
+                'user' => $user,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
 
     public function update(Request $request, $id)
     {
@@ -57,7 +75,7 @@ class UserController extends Controller
                 'role_id' => ['required'],
             ]);
 
-            User::find($id)->update($validatedData);
+            User::findOrFail($id)->update($validatedData);
             return response()->json([
                 'status' => true,
                 'message' => 'User updated successfully',

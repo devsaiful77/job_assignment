@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->foreignId('project_id')->constrained('projects');
-            $table->foreignId('assigned_to')->constrained('users');
+            $table->integer('project_id');
+            $table->integer('assigned_to');
             $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
             $table->timestamps();
         });
