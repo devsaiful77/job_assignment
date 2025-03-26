@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
-{   
+{
 
 
     public function index()
     {
         try {
-            $users = User::where('id', '!=', Auth::user()->id)->orderBy('id', 'DESC')->get();
+            $users = User::with('role:id,name')->where('id', '!=', Auth::user()->id)->orderBy('id', 'DESC')->get();
             return response()->json([
                 'status' => true,
                 'users' => $users
@@ -28,14 +28,14 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $validatedData = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
-                'role_id' => ['required'],
-            ]);
+        $validatedData = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role_id' => ['required'],
+        ]);
 
+        try {
             User::create($validatedData);
             return response()->json([
                 'status' => true,
@@ -72,6 +72,7 @@ class UserController extends Controller
             $validatedData = $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
+                'password' => ['nullable', 'string', 'min:8', 'confirmed'],
                 'role_id' => ['required'],
             ]);
 

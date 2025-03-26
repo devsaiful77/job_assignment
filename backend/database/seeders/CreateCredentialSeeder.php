@@ -16,8 +16,8 @@ class CreateCredentialSeeder extends Seeder
     {
         $roles = [
             'admin',
-            'user',
             'manager',
+            'user',
         ];
 
         foreach ($roles as $role) {

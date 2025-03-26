@@ -6,12 +6,12 @@ import DefaultLayout from "../components/DefaultLayout.vue";
 import store from "../store";
 
 const routes = [
-  { 
-    path: "/", 
-    name: "Login", 
+  {
+    path: "/",
+    name: "Login",
     component: Login,
     meta: { isGuest: true },
- },
+  },
 
   {
     path: "/dashboard",
@@ -20,9 +20,42 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       { path: "/dashboard", name: "Dashboard", component: Dashboard },
+
+      // { path: "/dashboard", name: "Dashboard", component: Dashboard },
+
+      {
+        path: "/users",
+        component: () => import("../views/user/Index.vue"),
+        name: "users",
+        meta: {
+          title: "User list",
+        },
+      },
+
+      {
+        path: "/user/create",
+        component: () => import("../views/user/Create.vue"),
+        name: "user_create",
+        meta: {
+          title: "User Create",
+        },
+      },
+
+      {
+        path: "/user/edit/:id",
+        name: "user_edit",
+        component: () => import("../views/user/Edit.vue"),
+        meta: {
+          title: "User Edit",
+        },
+      },
+
+      
+
+
+      // end 
     ],
   },
-  
 
   {
     path: "/404",
@@ -31,12 +64,31 @@ const routes = [
   },
 ];
 
+// const router = createRouter({
+//   history: createWebHistory(),
+//   routes,
+// });
+
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve({
+          x: 0,
+          y: 0,
+        });
+      }, 500);
+    });
+  },
 });
 
+
+
 router.beforeEach((to, from, next) => {
+  document.title = to.meta.title || "Admin Panel";
   if (to.meta.requiresAuth && !store.state.user.token) {
     next({ name: "Login" });
   } else if (store.state.user.token && to.meta.isGuest) {

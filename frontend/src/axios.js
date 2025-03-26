@@ -11,19 +11,40 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
+// axiosClient.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   (error) => {
+//     if (error.response.status === 401) {
+//       sessionStorage.removeItem("TOKEN");
+//       router.push({ name: "Login" });
+//     } else if (error.response.status === 404) {
+//       router.push({ name: "NotFound" });
+//     }
+//     return error;
+//   }
+// );
+
+
 axiosClient.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    if (error.response.status === 401) {
-      sessionStorage.removeItem("TOKEN");
-      router.push({ name: "Login" });
-    } else if (error.response.status === 404) {
-      router.push({ name: "NotFound" });
+    if (error.response) {
+      if (error.response.status === 401) {
+        sessionStorage.removeItem("TOKEN");
+        router.push({ name: "Login" });
+      } else if (error.response.status === 404) {
+        router.push({ name: "NotFound" });
+      }
     }
-    return error;
+    return Promise.reject(error); // Ensure the error is properly propagated
   }
 );
+
+
+
 
 export default axiosClient;
