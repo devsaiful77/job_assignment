@@ -6,10 +6,14 @@ use App\Models\Task;
 use App\Models\User;
 use App\Enums\Status;
 use App\Models\Project;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
 use App\Jobs\ProcessCsvJob;
+use App\Models\TaskHistory;
+
+use Illuminate\Http\Request;
+use App\Events\TaskAssignedEvent;
+use App\Events\TaskUpdatedEvent;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -45,7 +49,15 @@ class TaskController extends Controller
 
         try {
 
-            Task::create($data);
+            $task = Task::create($data);
+
+            TaskHistory::create([
+                'task_id' => $task->id,
+                'user_id' => auth()->id(),
+                'status' => 'assigned',
+            ]);
+
+            event(new TaskAssignedEvent($task));
             return response()->json([
                 'status' => true,
                 'message' => 'Task created successfully',
@@ -86,6 +98,21 @@ class TaskController extends Controller
 
 
         try {
+
+            $exiting_task = TaskHistory::where('task_id',$task->id)->first();
+            if($exiting_task){
+                $exiting_task->delete();
+            }
+
+            TaskHistory::create([
+                'task_id' => $task->id,
+                'user_id' => auth()->id(),
+                'status' => 'assigned',
+            ]);
+
+            event(new TaskAssignedEvent($task));
+
+
             $task->update($data);
             return response()->json([
                 'status' => true,
@@ -112,6 +139,16 @@ class TaskController extends Controller
 
         try {
             $task->update($data);
+
+            // task history updated...
+            $task_history = TaskHistory::where('task_id',$task->id)->first();
+            $task_history->status = $task->status == 'pending' ? 'assigned' : 'completed'; 
+            $task_history->save(); 
+
+            event(new TaskUpdatedEvent($task));
+
+
+
             return response()->json([
                 'status' => true,
                 'message' => 'Task update successfully',

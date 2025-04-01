@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('task_id');
             $table->integer('user_id');
-            $table->text('changes');
+            $table->string('status',20);
             $table->timestamps();
         });
     }
