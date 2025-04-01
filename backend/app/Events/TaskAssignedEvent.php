@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class TaskAssignedEvent implements ShouldBroadcast
@@ -28,7 +29,8 @@ class TaskAssignedEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('tasks');
+        // return new Channel('tasks');
+        return new PrivateChannel('tasks.' . $this->task->assigned_to);
     }
 
     public function broadcastWith()

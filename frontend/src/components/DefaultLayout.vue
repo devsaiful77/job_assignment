@@ -2,7 +2,16 @@
   <div>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container">
-        <a class="navbar-brand" href="#">{{ user.name }}</a>
+
+        <div>
+        <a class="navbar-brand" href="#">{{ userData.name }}</a>
+        <span class="btn btn-success btn-sm" v-if="userData.role_id == 3"> Assign Task  </span>
+        <span class="btn btn-success btn-sm" v-if="userData.role_id != 3"> Completed Task  </span>
+
+        </div>
+
+
+
         <button
           class="navbar-toggler"
           type="button"
@@ -53,29 +62,61 @@
 </template>
 
 <script>
-import { useStore } from "vuex";
-import { computed } from "vue";
-import { useRouter } from "vue-router";
-
+import Pusher from "pusher-js";
 export default {
-  setup() {
-    const store = useStore();
-    const router = useRouter();
+  data() {
+    return {
+      user: null,
+      tasks: [],
+      userId: 1,
+      roleId: 2,
+    };
+  },
+  computed: {
+    userData() {
+      return this.$store.state.user.data;
+    },
+  },
+  created() {
+    this.$store.dispatch("getUser");
+  },
 
-    function logout() {
-      store.dispatch("logout").then(() => {
-        router.push({
-          name: "Login",
-        });
+
+  mounted() {
+    Pusher.logToConsole = true;
+    const pusher = new Pusher("d844cc49690e223eb2c2", {
+      cluster: "ap2",
+      encrypted: true,
+      authEndpoint: "http://localhost:8000/broadcasting/auth", 
+      auth: {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("TOKEN")}`,
+        },
+      },
+    });
+
+    // Listen for task updates for assigned users
+    const taskChannel = pusher.subscribe(`private-tasks.${this.userData.id}`);
+    taskChannel.bind("App\\Events\\TaskUpdatedEvent", (data) => {
+      this.tasks.push(data);
+    });
+
+    // If the user is an admin or manager, listen to admin tasks
+    if ([1, 2].includes(this.userData.role_id)) {
+      const adminChannel = pusher.subscribe(`private-tasks.admins.${this.userData.id}`);
+      adminChannel.bind("App\\Events\\TaskUpdatedEvent", (data) => {
+        this.tasks.push(data);
       });
     }
+  },
 
-    store.dispatch("getUser");
 
-    return {
-      user: computed(() => store.state.user.data),
-      logout,
-    };
+  methods: {
+    logout() {
+      this.$store.dispatch("logout").then(() => {
+        this.$router.push({ name: "Login" });
+      });
+    },
   },
 };
 </script>

@@ -30,7 +30,18 @@ class TaskUpdatedEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('tasks');
+        $channels = [];
+
+        // Send notification to the assigned user
+        $channels[] = new PrivateChannel('tasks.' . $this->task->assigned_to);
+
+        // Send notification to all admins (role_id = 1) and managers (role_id = 2)
+        $adminsManagers = \App\Models\User::whereIn('role_id', [1, 2])->pluck('id');
+        foreach ($adminsManagers as $userId) {
+            $channels[] = new PrivateChannel('tasks.admins.' . $userId);
+        }
+
+        return $channels;
     }
 
     public function broadcastWith()
